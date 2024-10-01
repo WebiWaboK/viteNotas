@@ -4,7 +4,10 @@ import React, { createContext, useReducer, useState } from 'react';
 import AddNote from './components/AddNote';
 import AppBar from './components/AppBar'; // Importa el AppBar
 import ConfirmDeleteModal from './components/ConfirmDeleteModal';
+import CollectionPanel from './components/CollectionPanel'; // Importa el Panel de Colección de Notas
 import { Note } from './types';
+import { IconButton } from '@mui/material'; // Importa el componente IconButton
+import AddIcon from '@mui/icons-material/Add'; // Asegúrate de que este ícono esté instalado
 
 // Crear el contexto de notas
 export const NotesContext = createContext<{ state: Note[], dispatch: React.Dispatch<any> }>({
@@ -27,6 +30,8 @@ const App: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [noteToDelete, setNoteToDelete] = useState<Note | null>(null);
   const [isAddNoteOpen, setIsAddNoteOpen] = useState(false); // Controla el modal de agregar nota
+  const [isCollectionPanelOpen, setIsCollectionPanelOpen] = useState(false); // Controla el panel de colección
+  const [selectedCollectionNotes, setSelectedCollectionNotes] = useState<Note[]>([]); // Notas de la colección seleccionada
 
   const [state, dispatch] = useReducer(notesReducer, []);
 
@@ -53,6 +58,15 @@ const App: React.FC = () => {
     setNoteToDelete(null);
   };
 
+  const openCollectionPanel = (notes: Note[]) => {
+    setSelectedCollectionNotes(notes); // Asigna las notas seleccionadas
+    setIsCollectionPanelOpen(true); // Abre el panel de colección
+  };
+
+  const closeCollectionPanel = () => {
+    setIsCollectionPanelOpen(false); // Cierra el panel de colección
+  };
+
   return (
     <NotesContext.Provider value={{ state, dispatch }}>
       <div className="app">
@@ -63,6 +77,11 @@ const App: React.FC = () => {
           <AddNote onAddNote={addNote} onClose={() => setIsAddNoteOpen(false)} />
         )}
 
+        {/* Panel de colección de notas */}
+        {isCollectionPanelOpen && (
+          <CollectionPanel notes={selectedCollectionNotes} onClose={closeCollectionPanel} />
+        )}
+
         {/* Lista de notas */}
         <div className="notes-container">
           {state.map((note) => (
@@ -71,6 +90,7 @@ const App: React.FC = () => {
               <p>{note.content}</p>
               <button className="edit-button">Editar</button>
               <button className="delete-button" onClick={() => confirmDeleteNote(note)}>Eliminar</button>
+              <button className="view-collection-button" onClick={() => openCollectionPanel([note])}>Ver colección</button>
             </div>
           ))}
         </div>
@@ -83,13 +103,21 @@ const App: React.FC = () => {
           />
         )}
 
-        {/* Botón de agregar nota */}
-        <button
+        {/* Botón de agregar nota con ícono */}
+        <IconButton
           className="add-note-button"
           onClick={() => setIsAddNoteOpen(true)}
+          style={{
+            position: 'fixed',
+            bottom: '20px',
+            right: '20px',
+            backgroundColor: '#ffcccb', // Color pastel
+            borderRadius: '50%',
+            padding: '10px',
+          }}
         >
-          +
-        </button>
+          <AddIcon style={{ color: '#000' }} /> {/* Color del ícono */}
+        </IconButton>
       </div>
     </NotesContext.Provider>
   );

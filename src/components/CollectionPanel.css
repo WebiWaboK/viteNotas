@@ -1,0 +1,57 @@
+/* src/components/CollectionPanel.css */
+
+.collection-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Asegúrate de que esté por encima de otros elementos */
+}
+
+.collection-panel-content {
+    background: #fff; /* Fondo blanco */
+    padding: 20px; /* Padding de 20px */
+    border-radius: 8px; /* Bordes redondeados */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra */
+    max-width: 600px; /* Ancho máximo */
+    width: 100%; /* Ocupa todo el ancho posible */
+}
+
+.close-button {
+    background-color: #ffcccb; /* Color pastel */
+    border: none;
+    border-radius: 4px;
+    padding: 10px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    color: #000; /* Color del texto */
+}
+
+.notes-list {
+    max-height: 400px; /* Altura máxima */
+    overflow-y: auto; /* Habilita el desplazamiento si es necesario */
+}
+
+.note-item {
+    margin-bottom: 15px;
+    border-bottom: 1px solid #ddd; /* Línea separadora */
+    padding-bottom: 10px;
+}
+
+.note-item:last-child {
+    border-bottom: none; /* Quita la línea del último elemento */
+}
+
+.note-item h3 {
+    margin: 0; /* Elimina el margen por defecto */
+}
+
+.note-item p {
+    margin: 0; /* Elimina el margen por defecto */
+    color: #555; /* Color más suave para el contenido */
+}
