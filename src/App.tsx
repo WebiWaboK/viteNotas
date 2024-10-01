@@ -1,7 +1,8 @@
 // src/App.tsx
 
-import React, { createContext, useReducer, useState } from 'react'; // Asegúrate de incluir createContext
+import React, { createContext, useReducer, useState } from 'react';
 import AddNote from './components/AddNote';
+import AppBar from './components/AppBar'; // Importa el AppBar
 import ConfirmDeleteModal from './components/ConfirmDeleteModal';
 import { Note } from './types';
 
@@ -55,8 +56,8 @@ const App: React.FC = () => {
   return (
     <NotesContext.Provider value={{ state, dispatch }}>
       <div className="app">
-        <h1>Mi Aplicación de Notas</h1>
-
+        <AppBar /> {/* Añade el AppBar aquí */}
+        
         {/* Modal de agregar nota */}
         {isAddNoteOpen && (
           <AddNote onAddNote={addNote} onClose={() => setIsAddNoteOpen(false)} />

@@ -1,3 +1,5 @@
+// src/components/AddNote.tsx
+
 import React, { useContext, useState } from 'react';
 import { NotesContext } from '../App';
 import { Note } from '../types';
@@ -12,7 +14,7 @@ const AddNote: React.FC<AddNoteProps> = ({ onClose }) => {
   const [content, setContent] = useState('');
 
   const handleAddNote = () => {
-    if (!title || !content) return;
+    if (!title || !content) return; // Asegúrate de que el título y el contenido no estén vacíos
 
     const newNote: Note = {
       id: Math.floor(Math.random() * 1000), // Generar ID aleatorio
@@ -20,8 +22,10 @@ const AddNote: React.FC<AddNoteProps> = ({ onClose }) => {
       content,
     };
 
-    dispatch({ type: 'ADD_NOTE', payload: newNote });
+    dispatch({ type: 'ADD_NOTE', payload: newNote }); // Despacha la acción para agregar la nota
     onClose(); // Cerrar el modal después de agregar la nota
+    setTitle(''); // Limpiar el título
+    setContent(''); // Limpiar el contenido
   };
 
   return (
