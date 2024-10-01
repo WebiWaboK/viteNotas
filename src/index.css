@@ -3,6 +3,7 @@ body {
     font-family: 'Noto Sans', sans-serif;
     background-color: #f9f9f9; /* Color de fondo suave */
     color: #000; /* Color del texto */
+    margin: 0; /* Sin margen en el body */
 }
 
 .app {
@@ -54,15 +55,12 @@ button:hover {
     position: relative; /* Necesario para los botones */
     transition: transform 0.2s; /* Transición para hover */
     cursor: grab; /* Cambio de cursor */
-    width: 200px; /* Ancho fijo */
-    height: 200px; /* Alto fijo */
+    width: calc(33% - 20px); /* Ancho flexible, 3 notas por fila */
+    height: auto; /* Alto automático */
     display: flex; /* Para centrar el contenido */
     flex-direction: column; /* Para alinear verticalmente el contenido */
     justify-content: space-between; /* Espaciado entre el contenido */
-}
-
-.note:hover {
-    transform: translateY(-2px); /* Efecto de elevación al pasar el mouse */
+    box-sizing: border-box; /* Incluye el padding y border en el ancho total */
 }
 
 /* Estilo del título y contenido de la nota */
@@ -82,10 +80,6 @@ button:hover {
     top: 10px; /* Distancia desde la parte superior */
     right: 10px; /* Distancia desde la parte derecha */
     border-radius: 50%; /* Botones redondeados */
-}
-
-.edit-button {
-    margin-right: 40px; /* Espacio entre los botones */
 }
 
 /* Tooltip */
