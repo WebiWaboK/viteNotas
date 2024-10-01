@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap');
+
+body {
+  font-family: 'Noto Sans', sans-serif;
+  background-color: #f9f9f9; /* Color de fondo claro */
+  color: #000; /* Color del texto */
+  margin: 0;
+  padding: 0;
+}
+
+.app {
+  padding: 20px;
+}
+
+.app-bar {
+  background-color: #f0e68c; /* Color pastel para AppBar */
+  border-radius: 10px;
+  padding: 20px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.add-note {
+  display: flex;
+  flex-direction: column;
+  margin: 20px 0;
+}
+
+.add-note input, 
+.add-note textarea {
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.add-note button {
+  background-color: #7fd1c6; /* Color pastel */
+  color: #fff; /* Texto blanco */
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.notes-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.note {
+  background-color: #ffe4b5; /* Color pastel dinámico */
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.note:hover {
+  transform: scale(1.02); /* Efecto hover */
+}
