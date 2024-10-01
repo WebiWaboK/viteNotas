@@ -1,8 +1,8 @@
-// src/components/Note.tsx
-
 import React, { useContext } from 'react';
 import { NotesContext } from '../App';
 import { Note as NoteType } from '../types'; // Asegúrate de importar el tipo
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const Note = ({ note }: { note: NoteType }) => {
   const { dispatch } = useContext(NotesContext)!; // Usar el contexto de notas
@@ -22,15 +22,17 @@ const Note = ({ note }: { note: NoteType }) => {
   };
 
   return (
-    <div className="note">
+    <div className="note" draggable>
       <h3>{note.title}</h3>
       <p>{note.content}</p>
-      <button className="edit-button" onClick={handleEdit}>
-        Editar
-      </button>
-      <button className="delete-button" onClick={handleDelete}>
-        Eliminar
-      </button>
+      <div className="edit-button" onClick={handleEdit}>
+        <EditIcon />
+        <span className="tooltip">Editar</span>
+      </div>
+      <div className="delete-button" onClick={handleDelete}>
+        <DeleteIcon />
+        <span className="tooltip">Eliminar</span>
+      </div>
     </div>
   );
 };

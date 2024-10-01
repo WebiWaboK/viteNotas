@@ -14,12 +14,16 @@ const AddNote: React.FC<AddNoteProps> = ({ onClose }) => {
   const [content, setContent] = useState('');
   const [category, setCategory] = useState('');
   const [tags, setTags] = useState('');
+  const [error, setError] = useState('');
 
   const handleAddNote = () => {
-    if (!title || !content) return;
+    if (!title || !content) {
+      setError('El título y el contenido son obligatorios.');
+      return;
+    }
 
     const newNote: Note = {
-      id: Math.floor(Math.random() * 1000), // Generar ID aleatorio
+      id: Date.now(), // Usar timestamp como ID único
       title,
       content,
       category,
@@ -34,6 +38,7 @@ const AddNote: React.FC<AddNoteProps> = ({ onClose }) => {
     <div className="modal-overlay">
       <div className="modal">
         <h2>Agregar Nota</h2>
+        {error && <p style={{ color: 'red' }}>{error}</p>} {/* Mostrar mensaje de error */}
         <input
           type="text"
           placeholder="Título"

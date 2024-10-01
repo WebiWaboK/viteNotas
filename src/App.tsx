@@ -1,126 +1,161 @@
 // src/App.tsx
 
-import React, { createContext, useReducer, useState } from 'react';
+import React, { createContext, useReducer, useState, useEffect } from 'react';
 import AddNote from './components/AddNote';
-import AppBar from './components/AppBar'; // Importa el AppBar
+import AppBar from './components/AppBar'; 
 import ConfirmDeleteModal from './components/ConfirmDeleteModal';
-import CollectionPanel from './components/CollectionPanel'; // Importa el Panel de Colección de Notas
-import { Note } from './types';
-import { IconButton } from '@mui/material'; // Importa el componente IconButton
-import AddIcon from '@mui/icons-material/Add'; // Asegúrate de que este ícono esté instalado
+import CollectionPanel from './components/CollectionPanel'; 
+import { Note, Collection } from './types';
+import { IconButton } from '@mui/material'; 
+import AddIcon from '@mui/icons-material/Add';
 
 // Crear el contexto de notas
-export const NotesContext = createContext<{ state: Note[], dispatch: React.Dispatch<any> }>({
-  state: [],
-  dispatch: () => null,
+export const NotesContext = createContext<{
+    state: { notes: Record<string, Note[]>; collections: Collection[] };
+    dispatch: React.Dispatch<any>;
+}>({
+    state: { notes: {}, collections: [] },
+    dispatch: () => null,
 });
 
-const notesReducer = (state: Note[], action: any) => {
-  switch (action.type) {
-    case 'ADD_NOTE':
-      return [...state, action.payload];
-    case 'DELETE_NOTE':
-      return state.filter((note) => note.id !== action.payload);
-    default:
-      return state;
-  }
+const notesReducer = (state: { notes: Record<string, Note[]>; collections: Collection[] }, action: any) => {
+    switch (action.type) {
+        case 'ADD_NOTE': {
+            const { category } = action.payload;
+            const updatedNotes = {
+                ...state.notes,
+                [category]: [...(state.notes[category] || []), action.payload],
+            };
+            return { ...state, notes: updatedNotes };
+        }
+        case 'DELETE_NOTE': {
+            const updatedNotes = { ...state.notes };
+            for (const category in updatedNotes) {
+                updatedNotes[category] = updatedNotes[category].filter(note => note.id !== action.payload);
+            }
+            return { ...state, notes: updatedNotes };
+        }
+        case 'ADD_COLLECTION':
+            return { ...state, collections: [...state.collections, action.payload] };
+        default:
+            return state;
+    }
 };
 
 const App: React.FC = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [noteToDelete, setNoteToDelete] = useState<Note | null>(null);
-  const [isAddNoteOpen, setIsAddNoteOpen] = useState(false); // Controla el modal de agregar nota
-  const [isCollectionPanelOpen, setIsCollectionPanelOpen] = useState(false); // Controla el panel de colección
-  const [selectedCollectionNotes, setSelectedCollectionNotes] = useState<Note[]>([]); // Notas de la colección seleccionada
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [noteToDelete, setNoteToDelete] = useState<Note | null>(null);
+    const [isAddNoteOpen, setIsAddNoteOpen] = useState(false);
+    const [isCollectionPanelOpen, setIsCollectionPanelOpen] = useState(false);
+    const [selectedCollectionNotes, setSelectedCollectionNotes] = useState<Note[]>([]);
 
-  const [state, dispatch] = useReducer(notesReducer, []);
+    const [state, dispatch] = useReducer(notesReducer, { notes: {}, collections: [] });
 
-  const addNote = (newNote: Note) => {
-    dispatch({ type: 'ADD_NOTE', payload: newNote });
-    setIsAddNoteOpen(false); // Cierra el modal de agregar nota
-  };
+    useEffect(() => {
+        const savedNotes = localStorage.getItem('notes');
+        const savedCollections = localStorage.getItem('collections');
+        if (savedNotes) {
+            dispatch({ type: 'LOAD_NOTES', payload: JSON.parse(savedNotes) });
+        }
+        if (savedCollections) {
+            dispatch({ type: 'LOAD_COLLECTIONS', payload: JSON.parse(savedCollections) });
+        }
+    }, []);
 
-  const confirmDeleteNote = (note: Note) => {
-    setNoteToDelete(note);
-    setIsModalOpen(true); // Abre el modal de confirmación de eliminación
-  };
+    useEffect(() => {
+        localStorage.setItem('notes', JSON.stringify(state.notes));
+        localStorage.setItem('collections', JSON.stringify(state.collections));
+    }, [state.notes, state.collections]);
 
-  const handleDeleteNote = () => {
-    if (noteToDelete) {
-      dispatch({ type: 'DELETE_NOTE', payload: noteToDelete.id });
-    }
-    setIsModalOpen(false);
-    setNoteToDelete(null);
-  };
+    const addNote = (newNote: Note) => {
+        dispatch({ type: 'ADD_NOTE', payload: newNote });
+        setIsAddNoteOpen(false);
+    };
 
-  const handleCancelDelete = () => {
-    setIsModalOpen(false);
-    setNoteToDelete(null);
-  };
+    const confirmDeleteNote = (note: Note) => {
+        setNoteToDelete(note);
+        setIsModalOpen(true);
+    };
 
-  const openCollectionPanel = (notes: Note[]) => {
-    setSelectedCollectionNotes(notes); // Asigna las notas seleccionadas
-    setIsCollectionPanelOpen(true); // Abre el panel de colección
-  };
+    const handleDeleteNote = () => {
+        if (noteToDelete) {
+            dispatch({ type: 'DELETE_NOTE', payload: noteToDelete.id });
+        }
+        setIsModalOpen(false);
+        setNoteToDelete(null);
+    };
 
-  const closeCollectionPanel = () => {
-    setIsCollectionPanelOpen(false); // Cierra el panel de colección
-  };
+    const handleCancelDelete = () => {
+        setIsModalOpen(false);
+        setNoteToDelete(null);
+    };
 
-  return (
-    <NotesContext.Provider value={{ state, dispatch }}>
-      <div className="app">
-        <AppBar /> {/* Añade el AppBar aquí */}
-        
-        {/* Modal de agregar nota */}
-        {isAddNoteOpen && (
-          <AddNote onAddNote={addNote} onClose={() => setIsAddNoteOpen(false)} />
-        )}
+    const openCollectionPanel = (notes: Note[]) => {
+        setSelectedCollectionNotes(notes);
+        setIsCollectionPanelOpen(true);
+    };
 
-        {/* Panel de colección de notas */}
-        {isCollectionPanelOpen && (
-          <CollectionPanel notes={selectedCollectionNotes} onClose={closeCollectionPanel} />
-        )}
+    const closeCollectionPanel = () => {
+        setIsCollectionPanelOpen(false);
+    };
 
-        {/* Lista de notas */}
-        <div className="notes-container">
-          {state.map((note) => (
-            <div className="note" key={note.id}>
-              <h3>{note.title}</h3>
-              <p>{note.content}</p>
-              <button className="edit-button">Editar</button>
-              <button className="delete-button" onClick={() => confirmDeleteNote(note)}>Eliminar</button>
-              <button className="view-collection-button" onClick={() => openCollectionPanel([note])}>Ver colección</button>
+    return (
+        <NotesContext.Provider value={{ state, dispatch }}>
+            <div className="app">
+                <AppBar />
+
+                {isAddNoteOpen && (
+                    <AddNote onAddNote={addNote} onClose={() => setIsAddNoteOpen(false)} />
+                )}
+
+                {isCollectionPanelOpen && (
+                    <CollectionPanel notes={selectedCollectionNotes} onClose={closeCollectionPanel} />
+                )}
+
+                {/* Lista de notas agrupadas por categoría */}
+                <div className="notes-container">
+                    {Object.entries(state.notes).map(([category, notes]) => (
+                        <div key={category} className="category-container">
+                            <h3>{category}</h3>
+                            <div className="notes-flex-container"> {/* Nuevo contenedor flex */}
+                                {notes.map((note) => (
+                                    <div className="note" key={note.id}>
+                                        <h3>{note.title}</h3>
+                                        <p>{note.content}</p>
+                                        <button className="edit-button">Editar</button>
+                                        <button className="delete-button" onClick={() => confirmDeleteNote(note)}>Eliminar</button>
+                                        <button className="view-collection-button" onClick={() => openCollectionPanel([note])}>Ver colección</button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                {isModalOpen && (
+                    <ConfirmDeleteModal
+                        onConfirm={handleDeleteNote}
+                        onCancel={handleCancelDelete}
+                    />
+                )}
+
+                <IconButton
+                    className="add-note-button"
+                    onClick={() => setIsAddNoteOpen(true)}
+                    style={{
+                        position: 'fixed',
+                        bottom: '20px',
+                        right: '20px',
+                        backgroundColor: '#ffcccb',
+                        borderRadius: '50%',
+                        padding: '10px',
+                    }}
+                >
+                    <AddIcon style={{ color: '#000' }} />
+                </IconButton>
             </div>
-          ))}
-        </div>
-
-        {/* Modal de confirmación de eliminación */}
-        {isModalOpen && (
-          <ConfirmDeleteModal
-            onConfirm={handleDeleteNote}
-            onCancel={handleCancelDelete}
-          />
-        )}
-
-        {/* Botón de agregar nota con ícono */}
-        <IconButton
-          className="add-note-button"
-          onClick={() => setIsAddNoteOpen(true)}
-          style={{
-            position: 'fixed',
-            bottom: '20px',
-            right: '20px',
-            backgroundColor: '#ffcccb', // Color pastel
-            borderRadius: '50%',
-            padding: '10px',
-          }}
-        >
-          <AddIcon style={{ color: '#000' }} /> {/* Color del ícono */}
-        </IconButton>
-      </div>
-    </NotesContext.Provider>
-  );
+        </NotesContext.Provider>
+    );
 };
 
 export default App;
